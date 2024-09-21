@@ -2,7 +2,10 @@ GET  http://localhost:3333/
 content-type: application/json
 
 {
-    "origin": "cabreuva",
-    "destination": "itupeva",
-    "transitMode": "bus"
+    "origin": "rua minas gerais cabreuva",
+    "destination": "rIO DE JANEIRO",
+    "KmPerLiter": 6,
+    "bussTicket": 6,
+    "trainTicket": 7,
+    "haveBike": "yes"
 }
