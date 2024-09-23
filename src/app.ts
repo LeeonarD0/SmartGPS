@@ -1,7 +1,7 @@
 import express from "express";
+import { z } from 'zod'
 import { getGeoCoded } from "./Api/services/geoCoded";
 import { getDirection } from "./Api/services/getDirection";
-import { z } from 'zod'
 import { TravelMode } from "@googlemaps/google-maps-services-js";
 
 export const app = express();
@@ -16,32 +16,39 @@ app.get('/', async (req, res) => {
     origin: z.string(),
     destination: z.string(),
     KmPerLiter: z.number(),
+    ValuePerLiter: z.number(),
     bussTicket: z.number(),
     trainTicket: z.number(),
-    haveBike: z.string()
+    haveBike: z.enum(['yes', 'no'])
   })
 
+  
+  const { origin, destination, KmPerLiter, ValuePerLiter, bussTicket, trainTicket, haveBike } = GpsBodySchema.parse(req.body) // Todo: fix travelMode to accept only the TravelMode and TransitMode[] enum
 
-  const { origin, destination, KmPerLiter, bussTicket, trainTicket, haveBike } = GpsBodySchema.parse(req.body) // Todo: fix travelMode to accept only the TravelMode and TransitMode[] enum
-
+ 
   const originLatlng = await getGeoCoded(origin)
   const destinationLatLng = await getGeoCoded(destination)
 
-  const { legs } = await getDirection(originLatlng, destinationLatLng)
+  // === WALINKING MODE  === //
+  const travelModeWalking = await getDirection(originLatlng, destinationLatLng, TravelMode.walking)
+  const timeDurationWalking = travelModeWalking.legs[0].duration.value / 60
 
-  const travelDurationInSeconds = legs[0].duration.value
+  // === BYCICLING MODE == //
 
+  const travelModeBicycling = await getDirection(originLatlng, destinationLatLng, TravelMode.bicycling)
+  const timeDurationBicyling = travelModeBicycling.legs[0].duration.value / 60
+  
 
-  if (travelDurationInSeconds < 1500) {
-    const travelModeBike = await getDirection(originLatlng, destinationLatLng, TravelMode.walking)
-    const timeToGetThere = travelModeBike.legs[0].duration.value / 60
+  if (timeDurationWalking < 15) {  
     res.send({
       Message: 'For the time obtained, I realize it`s worth walking.',
-      DurationTime: `${Math.round(timeToGetThere)} Minutes`
+      DurationTime: `${Math.round(timeDurationWalking)}~ Minutes`
     })
 
-  } else if (travelDurationInSeconds > 1500) {
-    res.send('Loading...')
+  } else if (haveBike === 'yes' && timeDurationBicyling < 15) {
+    res.send({
+      message: 'For the time obtained, I realize it`s worth Bicycling.',
+      DurationTime: `${Math.round(timeDurationBicyling)}~ Minutes`
+    })
   }
-
 })

@@ -3,7 +3,7 @@ content-type: application/json
 
 {
     "origin": "rua minas gerais cabreuva",
-    "destination": "rIO DE JANEIRO",
+    "destination": "Cabreuva",
     "KmPerLiter": 6,
     "bussTicket": 6,
     "trainTicket": 7,
