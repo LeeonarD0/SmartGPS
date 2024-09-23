@@ -6,6 +6,7 @@ import { TravelMode } from "@googlemaps/google-maps-services-js";
 
 export const app = express();
 
+
 app.use(express.json()) // To read json requisition
 
 
@@ -50,5 +51,9 @@ app.get('/', async (req, res) => {
       message: 'For the time obtained, I realize it`s worth Bicycling.',
       DurationTime: `${Math.round(timeDurationBicyling)}~ Minutes`
     })
+  } else {
+    KmPerLiter // how many km your car does with 1 liter
+    ValuePerLiter // How much cost the petrol per liter
+    const totCarConsume = 5 * 23
   }
 })
